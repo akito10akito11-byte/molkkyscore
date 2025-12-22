@@ -1,72 +1,276 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>モルックスコア</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>モルックスコア</title>
+    
 <style>
-/* 基本スタイル */
+/* =========================================
+   基本スタイル
+   ========================================= */
 body {
     font-family: Arial, sans-serif;
     background: #f4f4f4;
     margin: 0;
     padding: 20px;
 }
-h1 { text-align: center; margin-bottom: 10px; }
-#setup-screen { max-width: 350px; width: 90%; background: white; padding: 20px; margin: 20px auto; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-.player-input { display: flex; gap: 10px; margin-bottom: 10px; }
-input { flex: 1; padding: 8px; font-size: 16px; }
-button { padding: 10px 20px; margin-top: 10px; font-size: 16px; cursor: pointer; }
-.scoreboard { display: none; margin: 20px auto; width: 90%; max-width: 350px; padding: 15px; background: white; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-.player-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 16px; }
-.pins-container { display: none; flex-wrap: wrap; width: 100%; max-width: 330px; margin: 20px auto; justify-content: center; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
-.pin { width: 50px; height: 70px; background: #ffe6b3; border: 3px solid #cc9933; border-radius: 15px; display: flex; justify-content: center; align-items: center; font-size: 20px; font-weight: bold; cursor: pointer; transition: 0.2s; flex-shrink: 0; }
-.pin:active { transform: scale(0.9); background: #ffcc66; }
-.undo-pin { background: #e0e0e0; border: 3px dashed #999; font-size: 16px; }
-.undo-pin:active { background: #ccc; }
-.pin.double-width { flex: 0 0 calc(50px * 2 + 10px); display: flex; justify-content: center; align-items: center; }
-#scoresheet-container { display: none; width: 95%; max-width: 700px; margin: 20px auto; background: white; padding: 15px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); overflow-x: auto; }
-#scoresheet { width: 100%; border-collapse: collapse; text-align: center; }
-#scoresheet th, #scoresheet td { border: 1px solid #ccc; padding: 6px; height: 30px; min-width: 40px; }
-#scoresheet tr:nth-child(even) { background: #f9f9f9; }
-#message-box { display: none; width: 90%; max-width: 400px; margin: 10px auto; padding: 10px; background: #ffe6cc; border: 2px solid #cc6600; border-radius: 8px; font-size: 16px; font-weight: bold; text-align: center; }
-#reset-btn { display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 12px 25px; font-size: 16px; cursor: pointer; z-index: 1000; background: #ffeb99; border: 2px solid #cc6600; border-radius: 8px; }
-#top-message-box { display: none; position: fixed; top: 10px; left: 50%; transform: translateX(-50%); background: #ffeb99; border: 2px solid #cc6600; border-radius: 8px; padding: 12px 20px; font-size: 18px; font-weight: bold; z-index: 1000; }
-@media screen and (max-width: 480px){
-    .pin { width: 45px; height: 60px; font-size: 18px; }
-    .player-row { font-size: 16px; } 
-    button { font-size: 14px; padding: 8px 16px; }
-    input { font-size: 14px; padding: 6px; }
-    #scoresheet th, #scoresheet td { min-width: 35px; padding: 6px; font-size: 16px; } 
+
+h1 {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+button {
+    padding: 10px 20px;
+    margin-top: 10px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+input {
+    flex: 1;
+    padding: 8px;
+    font-size: 16px;
+}
+
+/* =========================================
+   セットアップ画面
+   ========================================= */
+#setup-screen {
+    max-width: 350px;
+    width: 90%;
+    background: white;
+    padding: 20px;
+    margin: 20px auto;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.player-input {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+/* =========================================
+   ゲーム画面要素
+   ========================================= */
+/* スコアボード */
+.scoreboard {
+    display: none;
+    margin: 20px auto;
+    width: 90%;
+    max-width: 350px;
+    padding: 15px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.player-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    font-size: 16px;
+}
+
+/* ピン入力エリア */
+.pins-container {
+    display: none;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 330px;
+    margin: 20px auto;
+    justify-content: center;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+}
+
+.pin {
+    width: 50px;
+    height: 70px;
+    background: #ffe6b3;
+    border: 3px solid #cc9933;
+    border-radius: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+    flex-shrink: 0;
+}
+
+.pin:active {
+    transform: scale(0.9);
+    background: #ffcc66;
+}
+
+.undo-pin {
+    background: #e0e0e0;
+    border: 3px dashed #999;
+    font-size: 16px;
+}
+
+.undo-pin:active {
+    background: #ccc;
+}
+
+.pin.double-width {
+    flex: 0 0 calc(50px * 2 + 10px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* スコアシート */
+#scoresheet-container {
+    display: none;
+    width: 95%;
+    max-width: 700px;
+    margin: 20px auto;
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+}
+
+#scoresheet {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+#scoresheet th,
+#scoresheet td {
+    border: 1px solid #ccc;
+    padding: 6px;
+    height: 30px;
+    min-width: 40px;
+}
+
+#scoresheet tr:nth-child(even) {
+    background: #f9f9f9;
+}
+
+/* 通知・リセットボタン */
+#message-box {
+    display: none;
+    width: 90%;
+    max-width: 400px;
+    margin: 10px auto;
+    padding: 10px;
+    background: #ffe6cc;
+    border: 2px solid #cc6600;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+}
+
+#reset-btn {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 25px;
+    font-size: 16px;
+    cursor: pointer;
+    z-index: 1000;
+    background: #ffeb99;
+    border: 2px solid #cc6600;
+    border-radius: 8px;
+}
+
+#top-message-box {
+    display: none;
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ffeb99;
+    border: 2px solid #cc6600;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    z-index: 1000;
+}
+
+/* スマートフォン向けレスポンシブ対応 */
+@media screen and (max-width: 480px) {
+    .pin {
+        width: 45px;
+        height: 60px;
+        font-size: 18px;
+    }
+    .player-row {
+        font-size: 16px;
+    }
+    button {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+    input {
+        font-size: 14px;
+        padding: 6px;
+    }
+    #scoresheet th,
+    #scoresheet td {
+        min-width: 35px;
+        padding: 6px;
+        font-size: 16px;
+    }
 }
 </style>
 </head>
 <body>
 
-<h1>モルックスコア</h1>
+    <h1>モルックスコア</h1>
 
-<div id="setup-screen">
-    <h2>プレイヤー名を入力</h2>
-    <div id="player-inputs">
-        <div class="player-input"><input type="text" placeholder="Player 1" class="player-name"></div>
-        <div class="player-input"><input type="text" placeholder="Player 2" class="player-name"></div>
+    <div id="setup-screen">
+        <h2>プレイヤー名を入力</h2>
+        <div id="player-inputs">
+            <div class="player-input">
+                <input type="text" placeholder="Player 1" class="player-name">
+            </div>
+            <div class="player-input">
+                <input type="text" placeholder="Player 2" class="player-name">
+            </div>
+        </div>
+        <button onclick="addPlayer()">＋ プレイヤー追加</button><br>
+        <button onclick="startGame()">ゲーム開始</button>
     </div>
-    <button onclick="addPlayer()">＋ プレイヤー追加</button><br>
-    <button onclick="startGame()">ゲーム開始</button>
-</div>
 
-<div id="top-message-box"></div>
-<div class="scoreboard" id="scoreboard"></div>
-<div class="pins-container" id="pins"></div>
-<div id="scoresheet-container">
-    <h3>スコアシート</h3>
-    <table id="scoresheet"></table>
-</div>
-<div id="message-box"></div>
-<button id="reset-btn">ゲームをリセット</button>
+    <div id="top-message-box"></div>
+    
+    <div class="scoreboard" id="scoreboard"></div>
+    
+    <div class="pins-container" id="pins"></div>
+    
+    <div id="scoresheet-container">
+        <h3>スコアシート</h3>
+        <table id="scoresheet"></table>
+    </div>
+    
+    <div id="message-box"></div>
+    <button id="reset-btn">ゲームをリセット</button>
 
 <script>
-let players = [], turn = 0, currentTurn = 1, gameOver = false, historyStack = [];
+    // =========================================
+// グローバル変数とDOM要素の取得
+// =========================================
+let players = [];        // プレイヤー情報
+let turn = 0;           // 現在のターンのインデックス
+let currentTurn = 1;    // 現在のターン数（ラウンド数）
+let gameOver = false;   // ゲーム終了フラグ
+let historyStack = [];  // 履歴保存用スタック
+
 const setupScreen = document.getElementById("setup-screen");
 const scoreboard = document.getElementById("scoreboard");
 const pins = document.getElementById("pins");
@@ -74,8 +278,18 @@ const scoresheetContainer = document.getElementById("scoresheet-container");
 const scoresheet = document.getElementById("scoresheet");
 const resetBtn = document.getElementById("reset-btn");
 const topMessageBox = document.getElementById("top-message-box");
+
+// 初期化
 resetBtn.style.display = "none";
 
+
+// =========================================
+// ゲーム設定・開始処理
+// =========================================
+
+/**
+ * プレイヤー入力欄を追加する関数
+ */
 function addPlayer() {
     const div = document.createElement("div");
     div.className = "player-input";
@@ -84,132 +298,260 @@ function addPlayer() {
     document.getElementById("player-inputs").appendChild(div);
 }
 
+/**
+ * ゲームを開始する関数
+ * プレイヤー情報を初期化し、画面を切り替える
+ */
 function startGame() {
     const names = [...document.querySelectorAll(".player-name")].map(i => i.value.trim() || i.placeholder);
-    players = names.map(n => ({ name: n, score: 0, miss: 0, eliminated: false }));
+    
+    // プレイヤーオブジェクトの生成
+    players = names.map(n => ({
+        name: n,
+        score: 0,
+        miss: 0,
+        eliminated: false
+    }));
+
+    // 画面表示の切り替え
     setupScreen.style.display = "none";
     scoreboard.style.display = "block";
     pins.style.display = "flex";
     scoresheetContainer.style.display = "block";
+
+    // スコアシートとボードの描画
     createScoreSheet();
     renderScoreboard();
 }
 
+
+// =========================================
+// 状態管理（Undo機能）
+// =========================================
+
+/**
+ * 現在の状態をスタックに保存する関数
+ */
 function saveState() {
     historyStack.push({
+        // JSON変換でディープコピーを作成
         players: JSON.parse(JSON.stringify(players)),
-        turn, currentTurn, gameOver,
+        turn: turn,
+        currentTurn: currentTurn,
+        gameOver: gameOver,
         scoresheet: scoresheet.innerHTML
     });
 }
 
+/**
+ * 直前の状態に戻す関数（Undo）
+ */
 function undo() {
-    if(historyStack.length===0) return;
+    if (historyStack.length === 0) return;
+
     const s = historyStack.pop();
-    players=s.players; turn=s.turn; currentTurn=s.currentTurn; gameOver=s.gameOver;
+    players = s.players;
+    turn = s.turn;
+    currentTurn = s.currentTurn;
+    gameOver = s.gameOver;
     scoresheet.innerHTML = s.scoresheet;
+
+    // 表示のリセット
     topMessageBox.style.display = "none";
     resetBtn.style.display = gameOver ? "block" : "none";
     renderScoreboard();
 }
 
+
+// =========================================
+// 表示・描画関連
+// =========================================
+
+/**
+ * スコアシートの初期テーブルを作成する関数
+ */
 function createScoreSheet() {
-    scoresheet.innerHTML="";
-    let header="<tr><th>ターン</th>";
-    players.forEach(p=>header+=`<th>${p.name}</th><th>合計</th>`);
-    header+="</tr>"; scoresheet.innerHTML+=header;
-    for(let i=1;i<=15;i++){
-        let row=`<tr id="turn-${i}"><td>${i}</td>`;
-        players.forEach(()=>row+="<td></td><td></td>");
-        row+="</tr>"; scoresheet.innerHTML+=row;
+    scoresheet.innerHTML = "";
+    
+    // ヘッダー行の作成
+    let header = "<tr><th>ターン</th>";
+    players.forEach(p => header += `<th>${p.name}</th><th>合計</th>`);
+    header += "</tr>";
+    scoresheet.innerHTML += header;
+
+    // 15ターン分（仮）の空行を作成
+    for (let i = 1; i <= 15; i++) {
+        let row = `<tr id="turn-${i}"><td>${i}</td>`;
+        players.forEach(() => row += "<td></td><td></td>");
+        row += "</tr>";
+        scoresheet.innerHTML += row;
     }
 }
 
-function recordToScoreSheet(playerIndex, score){
-    let row=document.getElementById(`turn-${currentTurn}`);
-    const cells=row.querySelectorAll("td");
-    const scoreCell=1+playerIndex*2, totalCell=scoreCell+1;
-    const originalScore = score===0?"-":score;
-    cells[scoreCell].textContent=originalScore;
-    cells[totalCell].textContent=players[playerIndex].score;
+/**
+ * スコアシートに結果を記録する関数
+ * 記号入力ボタンも同時に生成する
+ */
+function recordToScoreSheet(playerIndex, score) {
+    let row = document.getElementById(`turn-${currentTurn}`);
+    
+    // 行が足りない場合の安全策（必要であれば行追加処理を入れる）
+    if (!row) return; 
 
-    const btnContainer=document.createElement("div");
-    btnContainer.style.display="flex";
-    btnContainer.style.justifyContent="center";
-    btnContainer.style.gap="4px";
+    const cells = row.querySelectorAll("td");
+    const scoreCell = 1 + playerIndex * 2;
+    const totalCell = scoreCell + 1;
+    
+    const originalScore = score === 0 ? "-" : score;
+    
+    cells[scoreCell].textContent = originalScore;
+    cells[totalCell].textContent = players[playerIndex].score;
 
-    const btnNormal=document.createElement("button");
-    btnNormal.textContent=originalScore;
-    btnNormal.style.fontSize="14px"; btnNormal.style.padding="2px 5px";
-    btnNormal.onclick=()=>{ cells[scoreCell].textContent=originalScore; };
-    btnContainer.appendChild(btnNormal);
+    // 記号入力用ボタンコンテナの作成
+    const btnContainer = document.createElement("div");
+    btnContainer.style.display = "flex";
+    btnContainer.style.justifyContent = "center";
+    btnContainer.style.gap = "4px";
 
-    const btnDot=document.createElement("button");
-    btnDot.textContent=originalScore+".";
-    btnDot.style.fontSize="14px"; btnDot.style.padding="2px 5px";
-    btnDot.onclick=()=>{ cells[scoreCell].textContent=originalScore+"."; };
-    btnContainer.appendChild(btnDot);
+    // ボタン生成ヘルパー
+    const createBtn = (text, onClickText) => {
+        const btn = document.createElement("button");
+        btn.textContent = text;
+        btn.style.fontSize = "14px";
+        btn.style.padding = "2px 5px";
+        btn.onclick = () => { cells[scoreCell].textContent = onClickText; };
+        return btn;
+    };
 
-    const btnSquare=document.createElement("button");
-    btnSquare.textContent=originalScore+"□";
-    btnSquare.style.fontSize="14px"; btnSquare.style.padding="2px 5px";
-    btnSquare.onclick=()=>{ cells[scoreCell].textContent=originalScore+"□"; };
-    btnContainer.appendChild(btnSquare);
+    btnContainer.appendChild(createBtn(originalScore, originalScore));
+    btnContainer.appendChild(createBtn(originalScore + ".", originalScore + "."));
+    btnContainer.appendChild(createBtn(originalScore + "□", originalScore + "□"));
 
-    if(score>=1 && score<=12){
-        const circled=String.fromCharCode(0x2460+score-1);
-        const btnCircled=document.createElement("button");
-        btnCircled.textContent=circled;
-        btnCircled.style.fontSize="14px"; btnCircled.style.padding="2px 5px";
-        btnCircled.onclick=()=>{ cells[scoreCell].textContent=circled; };
+    // ①〜⑫の丸数字ボタン（得点がある場合のみ）
+    if (score >= 1 && score <= 12) {
+        const circled = String.fromCharCode(0x2460 + score - 1);
+        const btnCircled = document.createElement("button");
+        btnCircled.textContent = circled;
+        btnCircled.style.fontSize = "14px";
+        btnCircled.style.padding = "2px 5px";
+        btnCircled.onclick = () => { cells[scoreCell].textContent = circled; };
         btnContainer.appendChild(btnCircled);
     }
 
     cells[scoreCell].appendChild(btnContainer);
 }
 
-function renderScoreboard(){
-    scoreboard.innerHTML="";
-    players.forEach((p,i)=>{
-        scoreboard.innerHTML+=`<div class="player-row">
-            <span>${i===turn?"👉 ":""}${p.name}${p.eliminated?"（脱落）":""}</span>
-            <span>${p.score} 点</span>
-        </div>`;
+/**
+ * スコアボード（画面上部）を更新する関数
+ */
+function renderScoreboard() {
+    scoreboard.innerHTML = "";
+    players.forEach((p, i) => {
+        scoreboard.innerHTML += `
+            <div class="player-row">
+                <span>${i === turn ? "👉 " : ""}${p.name}${p.eliminated ? "（脱落）" : ""}</span>
+                <span>${p.score} 点</span>
+            </div>`;
     });
 }
 
-function hitPin(num){
-    if(gameOver) return;
-    saveState();
-    const p=players[turn];
-    if(num===0){ p.miss++; if(p.miss>=3) p.eliminated=true; recordToScoreSheet(turn,0); }
-    else{ p.miss=0; p.score+=num; if(p.score>50)p.score=25; recordToScoreSheet(turn,num);}
+
+// =========================================
+// ゲームロジック
+// =========================================
+
+/**
+ * ピンが倒されたときの処理（メインロジック）
+ * @param {number} num - 倒したピンの点数（0〜12）
+ */
+function hitPin(num) {
+    if (gameOver) return;
+    
+    saveState(); // 履歴保存
+    
+    const p = players[turn];
+
+    if (num === 0) {
+        // ミスの場合
+        p.miss++;
+        if (p.miss >= 3) {
+            p.eliminated = true; // 3回連続ミスで脱落
+        }
+        recordToScoreSheet(turn, 0);
+    } else {
+        // 得点の場合
+        p.miss = 0;
+        p.score += num;
+        
+        // 50点オーバールール
+        if (p.score > 50) {
+            p.score = 25;
+        }
+        recordToScoreSheet(turn, num);
+    }
+
     renderScoreboard();
-    if(p.score===50){ topMessageBox.style.display="none"; gameOver=true; resetBtn.style.display="block"; return; }
+
+    // 勝利判定
+    if (p.score === 50) {
+        topMessageBox.style.display = "none";
+        gameOver = true;
+        resetBtn.style.display = "block";
+        return;
+    }
+
     nextTurn();
 }
 
-function nextTurn(){
-    let prev=turn;
-    do{ turn=(turn+1)%players.length; }while(players[turn].eliminated);
-    if(turn===0 && prev!==0) currentTurn++;
+/**
+ * 次のターンへ進む処理
+ * 脱落したプレイヤーをスキップする
+ */
+function nextTurn() {
+    let prev = turn;
+    
+    // 次の有効なプレイヤーが見つかるまでループ
+    do {
+        turn = (turn + 1) % players.length;
+    } while (players[turn].eliminated);
+
+    // 一周したらターン（ラウンド）数を増やす
+    if (turn === 0 && prev !== 0) {
+        currentTurn++;
+    }
 }
 
-// ピン生成
-[1,2,3,4,5,6,7,8,9,10,11,12].forEach(n=>{
-    const d=document.createElement("div");
-    d.className="pin"; d.textContent=n; d.onclick=()=>hitPin(n);
+
+// =========================================
+// イベントリスナー設定
+// =========================================
+
+// ピンボタンの生成
+[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].forEach(n => {
+    const d = document.createElement("div");
+    d.className = "pin";
+    d.textContent = n;
+    d.onclick = () => hitPin(n);
     pins.appendChild(d);
 });
-const zeroPin=document.createElement("div");
-zeroPin.className="pin"; zeroPin.textContent="0"; zeroPin.onclick=()=>hitPin(0);
+
+// 0点（ミス）ピン
+const zeroPin = document.createElement("div");
+zeroPin.className = "pin";
+zeroPin.textContent = "0";
+zeroPin.onclick = () => hitPin(0);
 pins.appendChild(zeroPin);
 
-const undoPin=document.createElement("div");
-undoPin.className="pin undo-pin double-width"; undoPin.textContent="もどる"; undoPin.onclick=undo;
+// もどるボタン
+const undoPin = document.createElement("div");
+undoPin.className = "pin undo-pin double-width";
+undoPin.textContent = "もどる";
+undoPin.onclick = undo;
 pins.appendChild(undoPin);
 
-resetBtn.onclick=()=>location.reload();
+// リセットボタン
+resetBtn.onclick = () => location.reload();
+
 </script>
 </body>
 </html>
